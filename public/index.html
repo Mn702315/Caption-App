@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caption Sync App</title>
+</head>
+<body>
+    <h1>Caption Sync App</h1>
+    <input type="file" id="videoInput" accept="video/*" />
+    <input type="file" id="captionInput" accept=".sbv" />
+    <button id="processButton">Process Video</button>
+
+    <script>
+        document.getElementById('processButton').addEventListener('click', () => {
+            const videoInput = document.getElementById('videoInput');
+            const captionInput = document.getElementById('captionInput');
+
+            if (!videoInput.files[0] || !captionInput.files[0]) {
+                alert('Please upload both video and caption files.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', videoInput.files[0]);
+            formData.append('captionFile', captionInput.files[0]);
+
+            fetch('http://localhost:5001/api/process-video', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.success) {
+                    alert('Video processed successfully! Check the server for the output file.');
+                } else {
+                    alert('Error processing video: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error processing video:', error);
+                alert('Error processing video: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>
